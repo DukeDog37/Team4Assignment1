@@ -8,6 +8,15 @@
 
   <!-- Bootstrap -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <!-- Firebase Reference -->
+    <script src="https://www.gstatic.com/firebasejs/live/3.0/firebase.js"></script>
+
+    <!-- Moment.js Reference -->
+    <!-- <script src="http://momentjs.com/downloads/moment.js"></script>   -->
+    <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+
 
 </head>
 
@@ -30,14 +39,19 @@
                 <h3 class="panel-title">Current Employees</h3>
               </div>
             <div class="panel-body">
-            <div class="table-responsive">
-              <table class="table">
-                <th>Employee Name</th>
-                <th>Role</th>
-                <th>Start Date</th>
-                <th>Months</th>
-                <th>Rate</th>
-                <th>Total Billed</th>
+            <table class="table table-hover" id='employee-table'>
+                <thead>
+                  <tr>
+                    <th>Employee Name</th>
+                    <th>Role</th>
+                    <th>Start Date</th>
+                    <th>Months Worked</th>
+                    <th>Monthly Rate ($)</th>
+                    <th>Total Billed ($)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
               </table>
             </div>
       </div>
@@ -135,16 +149,36 @@
     });
 
     // Firebase watcher + initial loader HINT: .on("value")
-    database.ref().on("value", function(snapshot) {
+    database.ref().on("child_added", function(childSnapshot) {
 
       // Log everything that's coming out of snapshot
-      console.log(snapshot.val());
-      console.log(snapshot.val().name);
-      console.log(snapshot.val().role);
-      console.log(snapshot.val().startdate);
-      console.log(snapshot.val().monthrate);
+      console.log(childSnapshot.val());
+      console.log(childSnapshot.val().name);
+      console.log(childSnapshot.val().role);
+      console.log(childSnapshot.val().startdate);
+      console.log(childSnapshot.val().monthrate);
 
+      // Store everything into a variable.
+      var empName = childSnapshot.val().name;
+      var empRole = childSnapshot.val().role;
+      var empStart = childSnapshot.val().startdate;
+      var empRate = childSnapshot.val().monthrate;
       // Change the HTML to reflect
+      // Prettify the employee start
+      var empStartPretty = moment.unix(empStart).format("MM/DD/YYYY");
+
+  // Calculate the months worked using hardcore math
+  // To calculate the months worked
+      var empMonths = moment().diff(moment.unix(empStart, "X"), "months");
+      console.log(empMonths);
+
+  // Calculate the total billed rate
+      var empBilled = empMonths * empRate;
+      console.log(empBilled);
+
+  // Add each train's data into the table
+  $("#employee-table > tbody").append("<tr><td>" + empName + "</td><td>" + empRole + "</td><td>" +
+  empStartPretty + "</td><td>" + empMonths + "</td><td>" + empRate + "</td><td>" + empBilled + "</td></tr>");
       //This is where the table population would go
       /*$("#name-display").html(snapshot.val().name);
       $("#role-display").html(snapshot.val().role);
