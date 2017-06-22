@@ -78,7 +78,7 @@
               </div>
               <div class="form-group">
                 <label for="age-input">Start Date (mm/dd/yyyy - ex. 01/01/1989):</label>
-                <input class="form-control" id="startdate-input" type="date">
+                <input class="form-control" id="startdate-input" type="text">
               </div>
               <div class="form-group">
                 <label for="comment-input">Monthly Rate:</label>
@@ -120,11 +120,7 @@
     // Create a variable to reference the database
     var database = firebase.database();
 
-    // Initial Values
-    var name = "";
-    var role = "";
-    var startdate = new Date();
-    var monthrate = "";
+    
 
     // Capture Button Click
     $("#add-user").on("click", function() {
@@ -134,10 +130,13 @@
       // YOUR TASK!!!
       // Code in the logic for storing and retrieving the most recent user.
       // Don't forget to provide initial data to your Firebase database.
-      name = $("#name-input").val().trim();
-      role = $("#role-input").val().trim();
-      startdate = $("#startdate-input").val().trim();
-      monthrate = $("#monthrate-input").val().trim();
+      var startdate = new Date();
+
+      var name = $("#name-input").val().trim();
+      var role = $("#role-input").val().trim();
+      startdate = moment($("#startdate-input").val().trim(), "MM/DD/YY").format("X");
+      var monthrate = $("#monthrate-input").val().trim();
+
 
       database.ref().push({
         name: name,
@@ -165,16 +164,16 @@
       var empRate = childSnapshot.val().monthrate;
       // Change the HTML to reflect
       // Prettify the employee start
-      var empStartPretty = moment.unix(empStart).format("MM/DD/YYYY");
+      var empStartPretty = moment(empStart).format("MM/DD/YY");
 
   // Calculate the months worked using hardcore math
   // To calculate the months worked
       var empMonths = moment().diff(moment.unix(empStart, "X"), "months");
-      console.log(empMonths);
+      console.log("empMonths: " + empMonths);
 
   // Calculate the total billed rate
       var empBilled = empMonths * empRate;
-      console.log(empBilled);
+      console.log("empBilled: " + empBilled);
 
   // Add each train's data into the table
   $("#employee-table > tbody").append("<tr><td>" + empName + "</td><td>" + empRole + "</td><td>" +
